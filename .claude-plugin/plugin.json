@@ -1,0 +1,16 @@
+{
+  "name": "create-mr",
+  "version": "1.0.0",
+  "description": "GitLab 커밋 및 MR 생성을 위한 Claude Code 플러그인",
+  "author": {
+    "name": "JoonSuk Cho",
+    "email": "chojs28@gmail.com"
+  },
+  "homepage": "https://github.com/JoonSukCho/create-mr",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JoonSukCho/create-mr.git"
+  },
+  "license": "MIT",
+  "keywords": ["gitlab", "commit", "merge-request", "korean", "conventional-commits"]
+}
