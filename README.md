@@ -14,23 +14,15 @@ GitLab 커밋 및 Merge Request 생성을 자동화하는 Claude Code 플러그�
 
 ## 설치
 
-### GitHub에서 직접 설치 (권장)
-
 ```bash
-/plugin install JoonSukCho/create-mr
-```
-
-### 마켓플레이스로 설치
-
-```bash
-# 마켓플레이스 추가
+# 1. 마켓플레이스 추가
 /plugin marketplace add JoonSukCho/create-mr
 
-# 플러그인 설치
+# 2. 플러그인 설치
 /plugin install create-mr@create-mr-marketplace
 ```
 
-### 로컬 설치
+### 로컬 설치 (개발용)
 
 ```bash
 /plugin install /path/to/create-mr
