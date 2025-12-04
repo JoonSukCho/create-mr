@@ -8,9 +8,15 @@
   },
   "homepage": "https://github.com/JoonSukCho/create-mr",
   "repository": {
-    "type": "git",
+    "type": "url",
     "url": "https://github.com/JoonSukCho/create-mr.git"
   },
   "license": "MIT",
-  "keywords": ["gitlab", "commit", "merge-request", "korean", "conventional-commits"]
+  "keywords": [
+    "gitlab",
+    "commit",
+    "merge-request",
+    "korean",
+    "conventional-commits"
+  ]
 }
