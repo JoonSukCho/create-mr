@@ -17,14 +17,16 @@
       },
       "description": "GitLab 커밋 및 MR 생성을 위한 Claude Code 플러그인",
       "version": "1.0.0",
-      "author": "joonsuk",
+      "author": {
+        "name": "JoonSuk Cho"
+      },
       "homepage": "https://github.com/JoonSukCho/create-mr",
       "repository": "https://github.com/JoonSukCho/create-mr",
       "license": "MIT",
       "keywords": ["gitlab", "commit", "merge-request", "korean"],
       "category": "version-control",
       "tags": ["gitlab", "workflow", "korean"],
-      "commands": ["commit", "mr"]
+      "commands": ["./commands/commit.md", "./commands/mr.md"]
     }
   ]
 }
