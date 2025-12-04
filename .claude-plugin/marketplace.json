@@ -12,8 +12,8 @@
     {
       "name": "create-mr",
       "source": {
-        "source": "github",
-        "repo": "JoonSukCho/create-mr"
+        "source": "git",
+        "url": "https://github.com/JoonSukCho/create-mr.git"
       },
       "description": "GitLab 커밋 및 MR 생성을 위한 Claude Code 플러그인",
       "version": "1.0.0",
