@@ -19,7 +19,7 @@ GitLab 커밋 및 Merge Request 생성을 자동화하는 Claude Code 플러그�
 /plugin marketplace add JoonSukCho/create-mr
 
 # 2. 플러그인 설치
-/plugin install create-mr@create-mr-marketplace
+/plugin install create-mr@kottonseed-frontend
 ```
 
 ### 로컬 설치 (개발용)

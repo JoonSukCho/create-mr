@@ -1,5 +1,5 @@
 {
-  "name": "create-mr-marketplace",
+  "name": "kottonseed-frontend",
   "owner": {
     "name": "JoonSuk Cho",
     "email": "chojs28@gmail.com"
@@ -23,7 +23,6 @@
       "homepage": "https://github.com/JoonSukCho/create-mr",
       "repository": "https://github.com/JoonSukCho/create-mr",
       "license": "MIT",
-      "keywords": ["gitlab", "commit", "merge-request", "korean"],
       "category": "version-control",
       "tags": ["gitlab", "workflow", "korean"],
       "commands": ["./commands/commit.md", "./commands/mr.md"]

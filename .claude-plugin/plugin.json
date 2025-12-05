@@ -7,12 +7,5 @@
     "email": "chojs28@gmail.com"
   },
   "homepage": "https://github.com/JoonSukCho/create-mr",
-  "license": "MIT",
-  "keywords": [
-    "gitlab",
-    "commit",
-    "merge-request",
-    "korean",
-    "conventional-commits"
-  ]
+  "license": "MIT"
 }
