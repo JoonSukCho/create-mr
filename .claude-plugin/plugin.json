@@ -1,6 +1,6 @@
 {
   "name": "create-mr",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "GitLab 커밋 및 MR 생성을 위한 Claude Code 플러그인",
   "author": {
     "name": "JoonSuk Cho",
