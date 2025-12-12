@@ -55,6 +55,7 @@ Detached HEAD 상태면: "현재 브랜치가 없습니다. 브랜치를 체크�
 - 입력하지 않으면 "develop" 사용
 
 타겟 브랜치가 존재하는지 확인:
+
 ```bash
 git rev-parse --verify origin/<TARGET_BRANCH>
 ```
@@ -64,6 +65,7 @@ git rev-parse --verify origin/<TARGET_BRANCH>
 ## Step 5: 커밋 개수 확인 및 메시지 가져오기
 
 커밋 개수 확인:
+
 ```bash
 git rev-list --count origin/<TARGET_BRANCH>..HEAD
 ```
@@ -71,6 +73,7 @@ git rev-list --count origin/<TARGET_BRANCH>..HEAD
 50개 초과 시: "⚠️ 커밋이 50개를 초과합니다. 최근 50개만 분석합니다." 경고 표시
 
 커밋 메시지 가져오기 (최대 50개):
+
 ```bash
 git log origin/<TARGET_BRANCH>..HEAD --pretty=format:"%s%n%b%n---" --reverse -50
 ```
@@ -94,6 +97,7 @@ git push -u origin HEAD
 ### 중요도 기준
 
 **🔴 (상) - 다음 중 하나라도 해당:**
+
 - 아키텍처/구조 변경
 - Breaking Changes
 - 보안 관련 변경
@@ -102,6 +106,7 @@ git push -u origin HEAD
 - 주요 라이브러리 업데이트
 
 **🟠 (중) - 다음 중 하나라도 해당:**
+
 - 신규 기능 추가 (feat)
 - API 변경
 - 주요 로직 수정
@@ -109,6 +114,7 @@ git push -u origin HEAD
 - 핵심 기능 버그 수정
 
 **🟢 (하) - 모두 해당:**
+
 - 텍스트/문구 변경
 - UI 스타일만 변경
 - 문서 업데이트
@@ -122,11 +128,13 @@ git push -u origin HEAD
 형식: `<이모지> [<타입>] <간결한 설명>`
 
 예시:
+
 - `🔴 [refactor] 인증 시스템 아키텍처 변경`
 - `🟠 [feat] 주문내역 UI 개선 및 컴포넌트 리팩토링`
 - `🟢 [docs] README 설치 가이드 업데이트`
 
 ### 규칙
+
 - **50자 이내**
 - **이모지만 사용** (상/중/하 텍스트 제외)
 - **타입은 대표 타입 하나만**
@@ -136,115 +144,60 @@ git push -u origin HEAD
 
 ```markdown
 ## 무엇을 변경했나요?
+
 [2-3문장으로 MR의 목적과 배경 설명]
 
 ## 주요 변경 사항
+
 - [커밋 분석 기반 변경사항 1]
 - [커밋 분석 기반 변경사항 2]
 - [커밋 분석 기반 변경사항 3]
 
 ## 리뷰 포인트
+
 - [리뷰어가 중점적으로 봐야 할 부분 1]
 - [리뷰어가 중점적으로 봐야 할 부분 2]
 ```
 
 ### Body 작성 지침
+
 - **무엇을 변경했나요?**: 비즈니스 가치나 해결한 문제 중심
 - **주요 변경 사항**: 커밋 메시지를 기반으로 구체적 변경사항 나열 (3-5개)
 - **리뷰 포인트**: 리스크 있는 부분, 테스트 필요한 부분 (2-4개)
 
 ## Step 10: GitLab MR URL 생성
 
-URL은 다음과 같은 단계로 생성합니다:
+URL 형식:
 
-### Step 10-1: MR 제목 URL 인코딩
-
-MR 제목을 URL 인코딩합니다. 반드시 다음 도구를 사용하여 정확하게 인코딩해야 합니다:
-
-**Option A (Node.js/jq 사용):**
-```bash
-ENCODED_TITLE=$(jq -rn --arg x "MR_TITLE_TEXT" '$x|@uri')
+```
+https://<GITLAB_URL>/<PROJECT_PATH>/-/merge_requests/new?merge_request[source_branch]=<SOURCE_BRANCH>&merge_request[target_branch]=<TARGET_BRANCH>&merge_request[title]=<URL_ENCODED_TITLE>&merge_request[description]=<URL_ENCODED_BODY>
 ```
 
-**Option B (Python 사용):**
-```bash
-ENCODED_TITLE=$(python3 -c "import urllib.parse; print(urllib.parse.quote('''MR_TITLE_TEXT'''))")
-```
+### URL 인코딩 규칙
 
-### Step 10-2: MR Body URL 인코딩
-
-MR Body(설명)를 URL 인코딩합니다:
-
-**Option A (Node.js/jq 사용):**
-```bash
-ENCODED_BODY=$(jq -rn --arg x "MR_BODY_TEXT" '$x|@uri')
-```
-
-**Option B (Python 사용):**
-```bash
-ENCODED_BODY=$(python3 -c "import urllib.parse; print(urllib.parse.quote('''MR_BODY_TEXT'''))")
-```
-
-### Step 10-3: Base URL 생성
-
-```bash
-BASE_URL="https://${GITLAB_URL}/${PROJECT_PATH}/-/merge_requests/new"
-```
-
-### Step 10-4: Query String 구성
-
-```bash
-QUERY_STRING="merge_request%5Bsource_branch%5D=${SOURCE_BRANCH}&merge_request%5Btarget_branch%5D=${TARGET_BRANCH}&merge_request%5Btitle%5D=${ENCODED_TITLE}&merge_request%5Bdescription%5D=${ENCODED_BODY}"
-```
-
-### Step 10-5: 최종 URL 조합
-
-```bash
-FINAL_URL="${BASE_URL}?${QUERY_STRING}"
-```
-
-### Step 10-6: URL 검증
-
-생성된 URL에 파라미터가 올바르게 포함되었는지 확인합니다:
-
-```bash
-# URL에 merge_request 파라미터가 포함되어 있는지 확인
-if [[ "$FINAL_URL" == *"merge_request"* ]]; then
-  echo "✓ URL 파라미터 포함 확인"
-else
-  echo "✗ URL 파라미터 누락 - URL 생성 실패"
-  exit 1
-fi
-```
-
-### URL 형식 참고
-```
-https://<GITLAB_URL>/<PROJECT_PATH>/-/merge_requests/new?merge_request%5Bsource_branch%5D=<SOURCE_BRANCH>&merge_request%5Btarget_branch%5D=<TARGET_BRANCH>&merge_request%5Btitle%5D=<ENCODED_TITLE>&merge_request%5Bdescription%5D=<ENCODED_BODY>
-```
-
-**주의사항:**
-- 인코딩은 반드시 `jq` 또는 `urllib.parse`를 사용하여 자동으로 수행
-- 수동으로 인코딩하지 않기 (특히 한글, 이모지는 자동 인코딩 필수)
-- 줄바꿈, 공백, 특수문자는 도구가 자동으로 처리
+- 한글 → UTF-8 퍼센트 인코딩
+- 줄바꿈 → `%0A`
+- 공백 → `%20`
+- `[` → `%5B`, `]` → `%5D`
+- `#` → `%23`
+- 이모지 → UTF-8 퍼센트 인코딩 (예: 🟠 → `%F0%9F%9F%A0`)
 
 ## Step 11: 브라우저 오픈
 
-생성된 FINAL_URL로 브라우저를 엽니다. OS를 감지하여 적절한 명령으로 실행합니다:
+OS를 감지하여 적절한 명령으로 브라우저를 엽니다:
 
 ```bash
 # macOS
-open "$FINAL_URL"
+open "<URL>"
 
 # Linux
-xdg-open "$FINAL_URL"
+xdg-open "<URL>"
 ```
-
-**중요**: `$FINAL_URL` 변수에 반드시 쿼리스트링이 포함되어 있어야 합니다.
-쿼리스트링이 누락된 경우 Step 10-6의 검증 단계에서 실패합니다.
 
 ## 출력 형식
 
 ### 성공 시:
+
 ```
 ✓ 현재 브랜치를 원격 저장소로 푸시 완료
 ✓ GitLab MR URL 생성 완료!
@@ -255,6 +208,7 @@ MR 제목: 🟠 [feat] 주문내역 UI 개선 및 컴포넌트 리팩토링
 ```
 
 ### 푸시 실패 시:
+
 ```
 ✗ 푸시 실패: <에러 메시지>
 MR 생성을 중단합니다.
@@ -270,13 +224,13 @@ MR 생성을 중단합니다.
 
 ## 에지 케이스 처리
 
-| 상황 | 처리 |
-|------|------|
-| Git 저장소 아님 | "Git 저장소가 아닙니다." |
-| Remote가 없음 | "원격 저장소가 설정되지 않았습니다." |
-| GitLab URL 아님 | "GitLab remote를 찾을 수 없습니다." |
-| Detached HEAD | "현재 브랜치가 없습니다." |
-| Target 브랜치 없음 | "타겟 브랜치가 존재하지 않습니다." |
-| 커밋 없음 | "타겟 브랜치와 동일합니다." |
-| 커밋 50개 초과 | 경고 + 최근 50개만 분석 |
-| 푸시 실패 | 에러 메시지 표시 후 중단 |
+| 상황               | 처리                                 |
+| ------------------ | ------------------------------------ |
+| Git 저장소 아님    | "Git 저장소가 아닙니다."             |
+| Remote가 없음      | "원격 저장소가 설정되지 않았습니다." |
+| GitLab URL 아님    | "GitLab remote를 찾을 수 없습니다."  |
+| Detached HEAD      | "현재 브랜치가 없습니다."            |
+| Target 브랜치 없음 | "타겟 브랜치가 존재하지 않습니다."   |
+| 커밋 없음          | "타겟 브랜치와 동일합니다."          |
+| 커밋 50개 초과     | 경고 + 최근 50개만 분석              |
+| 푸시 실패          | 에러 메시지 표시 후 중단             |
