@@ -155,30 +155,92 @@ git push -u origin HEAD
 
 ## Step 10: GitLab MR URL 생성
 
-URL 형식:
-```
-https://<GITLAB_URL>/<PROJECT_PATH>/-/merge_requests/new?merge_request[source_branch]=<SOURCE_BRANCH>&merge_request[target_branch]=<TARGET_BRANCH>&merge_request[title]=<URL_ENCODED_TITLE>&merge_request[description]=<URL_ENCODED_BODY>
+URL은 다음과 같은 단계로 생성합니다:
+
+### Step 10-1: MR 제목 URL 인코딩
+
+MR 제목을 URL 인코딩합니다. 반드시 다음 도구를 사용하여 정확하게 인코딩해야 합니다:
+
+**Option A (Node.js/jq 사용):**
+```bash
+ENCODED_TITLE=$(jq -rn --arg x "MR_TITLE_TEXT" '$x|@uri')
 ```
 
-### URL 인코딩 규칙
-- 한글 → UTF-8 퍼센트 인코딩
-- 줄바꿈 → `%0A`
-- 공백 → `%20`
-- `[` → `%5B`, `]` → `%5D`
-- `#` → `%23`
-- 이모지 → UTF-8 퍼센트 인코딩 (예: 🟠 → `%F0%9F%9F%A0`)
+**Option B (Python 사용):**
+```bash
+ENCODED_TITLE=$(python3 -c "import urllib.parse; print(urllib.parse.quote('''MR_TITLE_TEXT'''))")
+```
+
+### Step 10-2: MR Body URL 인코딩
+
+MR Body(설명)를 URL 인코딩합니다:
+
+**Option A (Node.js/jq 사용):**
+```bash
+ENCODED_BODY=$(jq -rn --arg x "MR_BODY_TEXT" '$x|@uri')
+```
+
+**Option B (Python 사용):**
+```bash
+ENCODED_BODY=$(python3 -c "import urllib.parse; print(urllib.parse.quote('''MR_BODY_TEXT'''))")
+```
+
+### Step 10-3: Base URL 생성
+
+```bash
+BASE_URL="https://${GITLAB_URL}/${PROJECT_PATH}/-/merge_requests/new"
+```
+
+### Step 10-4: Query String 구성
+
+```bash
+QUERY_STRING="merge_request%5Bsource_branch%5D=${SOURCE_BRANCH}&merge_request%5Btarget_branch%5D=${TARGET_BRANCH}&merge_request%5Btitle%5D=${ENCODED_TITLE}&merge_request%5Bdescription%5D=${ENCODED_BODY}"
+```
+
+### Step 10-5: 최종 URL 조합
+
+```bash
+FINAL_URL="${BASE_URL}?${QUERY_STRING}"
+```
+
+### Step 10-6: URL 검증
+
+생성된 URL에 파라미터가 올바르게 포함되었는지 확인합니다:
+
+```bash
+# URL에 merge_request 파라미터가 포함되어 있는지 확인
+if [[ "$FINAL_URL" == *"merge_request"* ]]; then
+  echo "✓ URL 파라미터 포함 확인"
+else
+  echo "✗ URL 파라미터 누락 - URL 생성 실패"
+  exit 1
+fi
+```
+
+### URL 형식 참고
+```
+https://<GITLAB_URL>/<PROJECT_PATH>/-/merge_requests/new?merge_request%5Bsource_branch%5D=<SOURCE_BRANCH>&merge_request%5Btarget_branch%5D=<TARGET_BRANCH>&merge_request%5Btitle%5D=<ENCODED_TITLE>&merge_request%5Bdescription%5D=<ENCODED_BODY>
+```
+
+**주의사항:**
+- 인코딩은 반드시 `jq` 또는 `urllib.parse`를 사용하여 자동으로 수행
+- 수동으로 인코딩하지 않기 (특히 한글, 이모지는 자동 인코딩 필수)
+- 줄바꿈, 공백, 특수문자는 도구가 자동으로 처리
 
 ## Step 11: 브라우저 오픈
 
-OS를 감지하여 적절한 명령으로 브라우저를 엽니다:
+생성된 FINAL_URL로 브라우저를 엽니다. OS를 감지하여 적절한 명령으로 실행합니다:
 
 ```bash
 # macOS
-open "<URL>"
+open "$FINAL_URL"
 
 # Linux
-xdg-open "<URL>"
+xdg-open "$FINAL_URL"
 ```
+
+**중요**: `$FINAL_URL` 변수에 반드시 쿼리스트링이 포함되어 있어야 합니다.
+쿼리스트링이 누락된 경우 Step 10-6의 검증 단계에서 실패합니다.
 
 ## 출력 형식
 
