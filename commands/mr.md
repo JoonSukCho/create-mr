@@ -170,7 +170,7 @@ git push -u origin HEAD
 URL 형식:
 
 ```
-https://<GITLAB_URL>/<PROJECT_PATH>/-/merge_requests/new?merge_request[source_branch]=<SOURCE_BRANCH>&merge_request[target_branch]=<TARGET_BRANCH>&merge_request[title]=<URL_ENCODED_TITLE>&merge_request[description]=<URL_ENCODED_BODY>
+https://<GITLAB_URL>/<PROJECT_PATH>/-/merge_requests/new?merge_request[source_branch]=<URL_ENCODED_SOURCE_BRANCH>&merge_request[target_branch]=<URL_ENCODED_TARGET_BRANCH>&merge_request[title]=<URL_ENCODED_TITLE>&merge_request[description]=<URL_ENCODED_BODY>
 ```
 
 ### URL 인코딩 규칙
@@ -191,6 +191,7 @@ https://<GITLAB_URL>/<PROJECT_PATH>/-/merge_requests/new?merge_request[source_br
 
 3. **기타 특수 문자**
 
+- `/` → `%2F` (브랜치 이름에서 필수! 예: `feature/user-login` → `feature%2Fuser-login`)
 - `[` → `%5B`, `]` → `%5D`
 - `#` → `%23`
 - 이모지 → UTF-8 퍼센트 인코딩 (예: 🟠 → `%F0%9F%9F%A0`)
