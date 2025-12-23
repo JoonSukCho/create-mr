@@ -173,28 +173,46 @@ URL 형식:
 https://<GITLAB_URL>/<PROJECT_PATH>/-/merge_requests/new?merge_request[source_branch]=<URL_ENCODED_SOURCE_BRANCH>&merge_request[target_branch]=<URL_ENCODED_TARGET_BRANCH>&merge_request[title]=<URL_ENCODED_TITLE>&merge_request[description]=<URL_ENCODED_BODY>
 ```
 
-### URL 인코딩 규칙
+### URL 인코딩 규칙 (필수)
 
-1. **한글 처리**
+⚠️ **중요: 모든 URL 파라미터는 반드시 완전히 인코딩된 상태로 생성해야 합니다.**
 
-   - UTF-8 바이트로 변환 후 각 바이트를 `%XX` 형식으로 인코딩
-   - 예: `가` → `%EA%B0%80`
-   - 예: `테스트` → `%ED%85%8C%EC%8A%A4%ED%8A%B8`
-   - ⚠️ 주의: URL 인코더 함수가 UTF-8을 올바르게 처리하는지 확인 필요
+#### 브랜치명 인코딩 절차 (반드시 순서대로)
 
-2. **공백 및 줄바꿈**
+1. **슬래시 `/` 인코딩 (가장 먼저!)**
+   - `/` → `%2F`
+   - 예: `feature/user-login` → `feature%2Fuser-login`
+   - 예: `hotfix/DEAN-cio_문구수정` → `hotfix%2FDEAN-cio_문구수정` (한글 인코딩 전)
 
+2. **한글 → UTF-8 퍼센트 인코딩**
+   - 각 한글 문자를 UTF-8 바이트로 변환 후 `%XX` 형식
+   - 예: `문` → `%EB%AC%B8`, `구` → `%EA%B5%AC`, `수` → `%EC%88%98`, `정` → `%EC%A0%95`
+   - 예: `문구수정` → `%EB%AC%B8%EA%B5%AC%EC%88%98%EC%A0%95`
+
+3. **공백 및 줄바꿈**
    - 공백 → `%20` (⚠️ `+` 사용 금지)
    - 줄바꿈 → `%0A`
    - 탭 → `%09`
-   - 캐리지 리턴 → `%0D`
 
-3. **기타 특수 문자**
+4. **기타 특수 문자**
+   - `[` → `%5B`, `]` → `%5D`
+   - `#` → `%23`
+   - 이모지 → UTF-8 퍼센트 인코딩 (예: 🟠 → `%F0%9F%9F%A0`)
 
-- `/` → `%2F` (브랜치 이름에서 필수! 예: `feature/user-login` → `feature%2Fuser-login`)
-- `[` → `%5B`, `]` → `%5D`
-- `#` → `%23`
-- 이모지 → UTF-8 퍼센트 인코딩 (예: 🟠 → `%F0%9F%9F%A0`)
+#### 완전한 인코딩 예시
+
+| 원본 브랜치명 | 인코딩된 결과 |
+|-------------|--------------|
+| `feature/user-login` | `feature%2Fuser-login` |
+| `hotfix/DEAN-cio_문구수정` | `hotfix%2FDEAN-cio_%EB%AC%B8%EA%B5%AC%EC%88%98%EC%A0%95` |
+| `feature/기능추가` | `feature%2F%EA%B8%B0%EB%8A%A5%EC%B6%94%EA%B0%80` |
+
+#### URL 생성 전 검증 체크리스트
+
+URL을 생성하기 전에 다음을 반드시 확인:
+- [ ] `source_branch=` 뒤에 인코딩되지 않은 한글이 없는가? (반드시 `%XX` 형태)
+- [ ] 브랜치명의 `/`가 모두 `%2F`로 치환되었는가?
+- [ ] `[`와 `]`가 `%5B`, `%5D`로 치환되었는가?
 
 ## Step 11: 브라우저 오픈
 
@@ -207,6 +225,23 @@ open "<URL>"
 # Linux
 xdg-open "<URL>"
 ```
+
+### URL 전달 시 주의사항
+
+⚠️ **중요: URL은 반드시 완전히 인코딩된 상태로 bash에 전달해야 합니다.**
+
+1. **큰따옴표 필수**: URL을 반드시 `"..."` 로 감싸서 셸 확장 방지
+2. **인코딩 상태 확인**: URL에 인코딩되지 않은 한글이나 `/`(브랜치명 내)가 있으면 안 됨
+3. **예시 (올바른 형태)**:
+   ```bash
+   open "https://gitlab.gum3.io/project/-/merge_requests/new?merge_request%5Bsource_branch%5D=hotfix%2FDEAN-cio_%EB%AC%B8%EA%B5%AC%EC%88%98%EC%A0%95&merge_request%5Btarget_branch%5D=develop"
+   ```
+
+4. **잘못된 예시** (이렇게 하면 안 됨):
+   ```bash
+   # 한글이 인코딩되지 않음 - 오류 발생!
+   open "https://gitlab.gum3.io/project/-/merge_requests/new?merge_request[source_branch]=hotfix/DEAN-cio_문구수정"
+   ```
 
 ## 출력 형식
 
